@@ -1,6 +1,18 @@
 const showSelect = document.getElementById("show-select");
 const showDetails = document.getElementById("show-details");
+const message = document.getElementById("message")
+
+function showMessage(text) {
+    message.textContent = text
+}
+
+function clearMessage() {
+    message.textContent = ""
+}
+
 async function loadPopularShows() {
+    clearMessage();
+    showMessage("Loading shows");
     const url = "https://api.themoviedb.org/3/tv/popular";
 
     const requestOptions = {
@@ -15,18 +27,26 @@ async function loadPopularShows() {
         const res = await fetch(url, requestOptions);
 
         if (!res.ok) {
+            if (res.status === 401) {
+                throw new Error("Access token rejected (401). Check the TMDB token in the config.js file.")
+            }
             throw new Error(`Request failed with status ${res.status}`);
         }
 
         const data = await res.json();
         console.log(data);
+        clearMessage();
         fillDropdown(data.results);
+
     } catch (error) {
+        showMessage(error.message);
         console.error(error);
     }
 }
 
 async function loadShowDetails(id) {
+    clearMessage();
+    showMessage("Loading show details");
     const url = `https://api.themoviedb.org/3/tv/${id}`;
     const requestOptions = {
         method: "GET",
@@ -40,14 +60,19 @@ async function loadShowDetails(id) {
         const res = await fetch(url, requestOptions);
 
         if (!res.ok) {
+            if (res.status === 401) {
+                throw new Error("Access token rejected (401). Check the TMDB token in the config.js file.")
+            }
             throw new Error(`Request failed with status ${res.status}`);
         }
 
         const show = await res.json();
 
         console.log(show);
+        clearMessage();
         displayDetails(show)
     } catch (error) {
+        showMessage(error.message)
         console.error(error);
     }
 }
