@@ -1,0 +1,1 @@
+//My awesome empty script.js file! 
