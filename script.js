@@ -2,17 +2,18 @@ const showSelect = document.getElementById("show-select");
 const showDetails = document.getElementById("show-details");
 const message = document.getElementById("message")
 
-function showMessage(text) {
+function showMessage(text, type="") {
     message.textContent = text
+    message.className = type;
 }
 
 function clearMessage() {
-    message.textContent = ""
+    showMessage("")
 }
 
 async function loadPopularShows() {
     clearMessage();
-    showMessage("Loading shows");
+    showMessage("Loading shows", "loading");
     const url = "https://api.themoviedb.org/3/tv/popular";
 
     const requestOptions = {
@@ -39,14 +40,14 @@ async function loadPopularShows() {
         fillDropdown(data.results);
 
     } catch (error) {
-        showMessage(error.message);
+        showMessage(error.message, "error");
         console.error(error);
     }
 }
 
 async function loadShowDetails(id) {
     clearMessage();
-    showMessage("Loading show details");
+    showMessage("Loading show details", "loading");
     const url = `https://api.themoviedb.org/3/tv/${id}`;
     const requestOptions = {
         method: "GET",
@@ -72,7 +73,7 @@ async function loadShowDetails(id) {
         clearMessage();
         displayDetails(show)
     } catch (error) {
-        showMessage(error.message)
+        showMessage(error.message, "error")
         console.error(error);
     }
 }
@@ -112,22 +113,30 @@ function displayDetails(show) {
     const heading = document.createElement("h2");
     heading.textContent = show.name;
     showDetails.appendChild(heading);
+    const layout = document.createElement("div")
+    layout.className = "layout"
 
     if (show.poster_path) {
         const img = document.createElement("img")
         img.src = `https://image.tmdb.org/t/p/w500${show.poster_path}`
         img.alt = `Poster for ${show.name}`
-        showDetails.appendChild(img)
+        // showDetails.appendChild(img)
+        layout.appendChild(img)
     }
     else {
         const nullPoster = document.createElement("p")
         nullPoster.textContent = "No poster is available for the selected show"
-        showDetails.appendChild(nullPoster)
+        // showDetails.appendChild(nullPoster)
+        layout.appendChild(nullPoster)
     }
 
+
+    const divParagraphs = document.createElement("div")
+    divParagraphs.className = "divParagraphs"
     const overview = document.createElement("p")
     overview.textContent = show.overview
-    showDetails.appendChild(overview)
+    // showDetails.appendChild(overview)
+    divParagraphs.appendChild(overview)
 
     const genreParagraph = document.createElement("p")
     if (show.genres && show.genres.length > 0) {
@@ -142,10 +151,15 @@ function displayDetails(show) {
     else {
         genreParagraph.textContent = "Genres aren't available for this show"
     }
-    showDetails.appendChild(genreParagraph)
+    // showDetails.appendChild(genreParagraph)
+    divParagraphs.appendChild(genreParagraph)
 
     const showStatus = document.createElement("p")
     showStatus.textContent = `This show has ${show.number_of_seasons} seasons, ${show.number_of_episodes} Episodes, and it's status is: ${show.status}`
-    showDetails.appendChild(showStatus);
+    // showDetails.appendChild(showStatus);
+    divParagraphs.appendChild(showStatus)
+
+    layout.appendChild(divParagraphs)
+    showDetails.appendChild(layout)
 
 }
